@@ -54,3 +54,16 @@ out3=x.sum()
 x.grad.data.zero_()
 out3.backward()
 print(x.grad)
+
+from time import time
+a=torch.ones(1000)
+b=torch.ones(1000)
+c=torch.zeros(1000)
+
+start=time()
+for i in range(1000):
+    c[i]=a[i]+b[i]
+print(time()-start)
+start=time()
+c=a+b
+print(time()-start)
