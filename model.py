@@ -21,6 +21,7 @@ class AlexNet(nn.Module):
         x = nn.Softmax(self.fc3(x))
         return x
 
+#######
 if __name__ == '__main__':
     print('hello world')
     net = AlexNet()
