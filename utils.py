@@ -4,13 +4,14 @@ from IPython import display
 import matplotlib.pyplot as plt
 import random
 
-def plot(x,y):
-    def use_svg_display():
-        display.set_matplotlib_formats('svg')
-    def set_figsize(figsize=(3.5,2.5)):
-        use_svg_display()
-        plt.rcParams['figure.figsize']=figsize
+def use_svg_display():
+    display.set_matplotlib_formats('svg')
 
+def set_figsize(figsize=(3.5,2.5)):
+    use_svg_display()
+    plt.rcParams['figure.figsize']=figsize
+
+def plot(x,y):
     set_figsize()
     plt.scatter(x,y,1)
     plt.show()
@@ -43,3 +44,62 @@ def sgd(params,lr,batch_size):
     for param in params:
         param.data -= lr*param.grad/batch_size
 
+import torchvision
+import torchvision.transforms as transforms
+import sys
+def download_FashionMNIST(is_download=True):
+    mnist_train=torchvision.datasets.FashionMNIST(root='./dataset/FashionMNIST',train=True,transform=transforms.ToTensor(),download=is_download);
+    mnist_test=torchvision.datasets.FashionMNIST(root='./dataset/FashionMNIST',train=False,transform=transforms.ToTensor(),download=is_download);
+    return mnist_train,mnist_test
+
+mnist_train,mnist_test=download_FashionMNIST(is_download=False)
+
+def load_data_fashion_mnist(batch_size=256):
+    if sys.platform.startswith('win'):
+        num_workers=0
+    else:
+        num_workers=4
+    train_iter=torch.utils.data.DataLoader(mnist_train,batch_size=batch_size,shuffle=True,num_workers=num_workers)
+    test_iter=torch.utils.data.DataLoader(mnist_test,batch_size=batch_size,shuffle=False,num_workers=num_workers)
+    return train_iter,test_iter
+
+def evaluate_accuracy(data_iter,net):
+    acc_sum=0.
+    m=0
+    for X,y in data_iter:
+        acc_sum += (net(X).argmax(dim=1)==y).float().sum().item()
+        m += y.shape[0]
+    return acc_sum/m
+
+def train_ch3(net,train_iter,test_iter,loss,num_epoch,batch_size,params=None,lr=None,optimizer=None):
+    for epoch in range(num_epoch):
+        loss_sum,acc_sum,n=0.0,0.0,0
+        for X,y in train_iter:
+            y_hat = net(X)
+            l=loss(y_hat,y).sum()
+
+            # 梯度清零
+            if optimizer is not None:
+                optimizer.zero_grad()
+            elif params is not None and params[0].grad is not None:
+                for param in params:
+                    param.grad.data.zero_()
+            l.backward()
+            if optimizer is None:
+                sgd(params,lr,batch_size)
+            else:
+                optimizer.step()
+
+            acc_sum += (y_hat.argmax(dim=1)==y).sum().item()
+            loss_sum += l.item()
+            n += y.shape[0]
+
+        test_acc = evaluate_accuracy(test_iter,net)
+        print(f'epoch={epoch}, loss={loss_sum/n}, train_acc={acc_sum/n}, test_acc={test_acc}')
+
+class FlattenLayer(torch.nn.Module):
+    def __init__(self):
+        super(FlattenLayer,self).__init__()
+
+    def forward(self,x):
+        return x.view(x.shape[0],-1)
