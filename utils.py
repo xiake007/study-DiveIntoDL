@@ -44,6 +44,18 @@ def sgd(params,lr,batch_size):
     for param in params:
         param.data -= lr*param.grad/batch_size
 
+def semilogy(x_vals,y_vals,x_label,y_label,x2_vals=None,y2_vals=None,
+             legend=None,figsize=(3.5,2.5)):
+    set_figsize(figsize)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.semilogy(x_vals,y_vals)
+    if x2_vals and y2_vals:
+        plt.semilogy(x2_vals,y2_vals,linestyle=':')
+        plt.legend(legend)
+
+    plt.show()
+
 import torchvision
 import torchvision.transforms as transforms
 import sys

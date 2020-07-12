@@ -102,9 +102,9 @@ def test_softmax_org():
     # print(obj.cross_entropy(y_hat,y))
     # print(obj.accuracy(y_hat,y))
     _,test_iter=utils.load_data_fashion_mnist()
-    # print(utils.evaluate_accuracy(test_iter,obj.net))
-    obj.train()
-    obj.test()
+    print(utils.evaluate_accuracy(test_iter,obj.net))
+    # obj.train()
+    # obj.test()
 
 if __name__=='__main__':
     # test_download_MNIST()

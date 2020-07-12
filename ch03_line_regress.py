@@ -60,6 +60,7 @@ class LineRegressOrg(object):
                 sgd([w,b],lr,batch_size)
                 w.grad.data.zero_()
                 b.grad.data.zero_()
+
             train_loss = Loss(Net(self.features,w,b),self.labels)
             print('epoch %d: loss is %f, w1=%f,w2=%f,b=%f'%(epoch,train_loss.mean().item(),
                                                             w[0].data.numpy(),w[1].data.numpy(),b.data.numpy()))
