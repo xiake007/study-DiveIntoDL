@@ -79,7 +79,15 @@ def evaluate_accuracy(data_iter,net):
     acc_sum=0.
     m=0
     for X,y in data_iter:
-        acc_sum += (net(X).argmax(dim=1)==y).float().sum().item()
+        if isinstance(net,torch.nn.Module):
+            net.eval()
+            acc_sum += (net(X).argmax(dim=1)==y).float().sum().item()
+            net.train()
+        else:
+            if('is_trainning' in net.__code__.co_varnames):
+                acc_sum += (net(X,is_trainning=False).argmax(dim=1)==y).float().sum().item()
+            else:
+                acc_sum += (net(X).argmax(dim=1)==y).float().sum().item()
         m += y.shape[0]
     return acc_sum/m
 
