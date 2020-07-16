@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.utils.data as Data
 import numpy as np
 import pandas as pd
 import utils
@@ -32,10 +33,12 @@ class HousePrice(object):
         train_labels=torch.tensor(self.train_data.SalePrice.values,dtype=torch.float)
         return train_features,test_features,train_labels
 
-    def loss(self,net,X,y):
-        mse_ls=nn.MSELoss()
+    def loss(self):
+        return nn.MSELoss()
+
+    def log_rmse(self,net,X,y):
         pre_labels = torch.max(net(X),torch.tensor(1.))
-        log_rmse=torch.sqrt(mse_ls(pre_labels.log(),y.log))
+        log_rmse=torch.sqrt(self.loss()(pre_labels.log(),y.log))
         return log_rmse.item()
 
     def net(self,n_input):
@@ -43,9 +46,23 @@ class HousePrice(object):
         for param in net.parameters():
             nn.init.normal_(param,mean=0,std=0.01)
 
-    def train(self):
-        pass
-
+    def train(self,net,train_features,train_labels,test_features,test_labels,
+              n_epochs,lr,weight_decay,batch_size):
+        train_ls,test_ls=[],[]
+        dataset=Data.TensorDataset(train_features,train_labels)
+        train_iter=Data.DataLoader(dataset,batch_size=batch_size,shuffle=True)
+        optimization=torch.optim.Adam(params=net.parameters(),lr=lr,weight_decay=weight_decay)
+        net=net.float()
+        for epoch in range(n_epochs):
+            for X,y in train_iter:
+                loss = self.loss(net(X.float()),y.float())
+                optimization.zero_grad()
+                loss.backward()
+                optimization.step()
+            train_ls.append(self.log_rmse(net,train_features,train_labels))
+            if test_features is not None:
+                test_ls.append(self.log_rmse(net,test_features,test_labels))
+        return train_ls,test_ls
 
 
 def test():
