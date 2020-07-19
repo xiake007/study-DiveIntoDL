@@ -6,6 +6,7 @@ import pandas as pd
 import utils
 import os.path as osp
 
+#
 class HousePrice(object):
     def __init__(self):
         self.dataset_path='./dataset/kaggle_house'
