@@ -60,8 +60,8 @@ import torchvision
 import torchvision.transforms as transforms
 import sys
 def download_FashionMNIST(is_download=True):
-    mnist_train=torchvision.datasets.FashionMNIST(root='./dataset/FashionMNIST',train=True,transform=transforms.ToTensor(),download=is_download);
-    mnist_test=torchvision.datasets.FashionMNIST(root='./dataset/FashionMNIST',train=False,transform=transforms.ToTensor(),download=is_download);
+    mnist_train=torchvision.datasets.FashionMNIST(root='../dataset/FashionMNIST',train=True,transform=transforms.ToTensor(),download=is_download);
+    mnist_test=torchvision.datasets.FashionMNIST(root='../dataset/FashionMNIST',train=False,transform=transforms.ToTensor(),download=is_download);
     return mnist_train,mnist_test
 
 mnist_train,mnist_test=download_FashionMNIST(is_download=False)
