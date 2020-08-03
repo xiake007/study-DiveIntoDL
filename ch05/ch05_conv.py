@@ -48,8 +48,22 @@ def train():
             print(f'step={i+1}: loss is {l.item()}')
     print(conv2d.weight.data,conv2d.bias.data)
 
+def test_comp_conv2d():
+    def comp_conv2d(conv2d,X):
+        X=X.view((1,1)+X.shape)
+        Y=conv2d(X)
+        return Y.view(Y.shape[2:])
+    X=torch.rand(8,8)
+    conv2d=nn.Conv2d(in_channels=1,out_channels=1,kernel_size=3,padding=1)
+    Y=comp_conv2d(conv2d,X)
+    print(Y.shape)
+    conv2d=nn.Conv2d(in_channels=1,out_channels=1,kernel_size=(5,3),padding=(2,1))
+    Y=comp_conv2d(conv2d,X)
+    print(Y.shape)
+
+
 if __name__=='__main__':
     # test()
     # test_img_border_detect()
-    train()
-
+    # train()
+    test_comp_conv2d()
